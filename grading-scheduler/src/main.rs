@@ -6,7 +6,10 @@ use warp::Filter;
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     tokio::spawn(async move {
-        initialize_runners().await.unwrap();
+        match initialize_runners().await {
+            Ok(_) => println!("Successfully initialized runners"),
+            Err(e) => println!("Failed to initialize runners: {}", e),
+        };
     });
 
     // Get each deployment to register with the main node
@@ -37,7 +40,7 @@ async fn initialize_runners() -> Result<(), Box<dyn std::error::Error>> {
     let wait = None;
     let prefix = None;
 
-    let nodes = get_nodes(&config, namespace, region, index, wait, prefix).await?;
+    let _nodes = get_nodes(&config, namespace, region, index, wait, prefix).await?;
 
     Ok(())
 }

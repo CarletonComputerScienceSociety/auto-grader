@@ -1,4 +1,4 @@
-job "grader" {
+job "grader2" {
   datacenters = ["dc1"]
 
   group "scheduler" {
@@ -10,12 +10,12 @@ job "grader" {
 
     service {
       name = "grading-scheduler"
-      port = "frontend"
+      port = "backend"
 
       check {
         type     = "http"
-        port     = "frontend"
-        path     = "/"
+        port     = "backend"
+        path     = "/hello"
         interval = "5s"
         timeout  = "2s"
 
@@ -49,7 +49,7 @@ job "grader" {
       driver = "docker"
 
       config {
-        image = "ghcr.io/angelonfira/rust-test-server/runners:latest"
+        image = "ghcr.io/angelonfira/rust-test-server/runner:latest"
       }
 
       resources {
