@@ -253,6 +253,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "grading-scheduler"
+version = "0.1.0"
+dependencies = [
+ "nomad-client",
+ "tokio",
+ "warp",
+]
+
+[[package]]
 name = "h2"
 version = "0.3.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -807,15 +816,6 @@ dependencies = [
  "wasm-bindgen-futures",
  "web-sys",
  "winreg",
-]
-
-[[package]]
-name = "rust-test-server"
-version = "0.1.0"
-dependencies = [
- "nomad-client",
- "tokio",
- "warp",
 ]
 
 [[package]]
