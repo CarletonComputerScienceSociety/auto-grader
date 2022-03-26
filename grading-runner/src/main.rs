@@ -9,7 +9,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     loop {
         sleep(Duration::from_millis(1000)).await;
-        let res = client.get("http://scheduler:4000/hello").send().await;
+        let res = client.get("http://192.168.1.102:4000/hello").send().await;
 
         // Handle the response
         match res {
