@@ -34,7 +34,7 @@ jobs:
           tags: |
             ghcr.io/angelonfira/rust-test-server/runner:latest
 
-    build-scheduler:
+  build-scheduler:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
