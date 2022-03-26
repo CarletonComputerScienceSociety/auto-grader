@@ -1,4 +1,4 @@
-job "grader3" {
+job "grader5" {
   datacenters = ["dc1"]
 
   group "scheduler" {
@@ -36,14 +36,14 @@ job "grader3" {
       }
 
       resources {
-        cpu    = 100
-        memory = 100
+        cpu    = 4000
+        memory = 1000
       }
     }
   }
 
   group "runners" {
-    count = 30
+    count = 3
 
     task "runner" {
       driver = "docker"
@@ -53,8 +53,8 @@ job "grader3" {
       }
 
       resources {
-        cpu    = 100
-        memory = 100
+        cpu    = 10
+        memory = 15
       }
     }
   }

@@ -9,7 +9,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     loop {
         sleep(Duration::from_millis(1000)).await;
-        let _res = client.get("http://scheduler:4000/hello").send().await;
-        // let _body = res.text().await?;
+        let res = client.get("http://scheduler:4000/hello").send().await;
+
+        // Handle the response
+        match res {
+            Ok(res) => {
+                println!("Response: {}", res.text().await?);
+            }
+            Err(e) => {
+                println!("Error: {}", e);
+            }
+        }
     }
 }
