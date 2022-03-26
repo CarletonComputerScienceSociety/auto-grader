@@ -1,10 +1,10 @@
-job "grader5" {
+job "grader8" {
   datacenters = ["dc1"]
 
   group "scheduler" {
     network {
       port "backend" {
-        to = 4000
+        static = 4000
       }
     }
 
