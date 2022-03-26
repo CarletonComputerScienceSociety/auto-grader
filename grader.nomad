@@ -1,4 +1,4 @@
-job "grader2" {
+job "grader3" {
   datacenters = ["dc1"]
 
   group "scheduler" {

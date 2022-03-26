@@ -6,7 +6,7 @@ WORKDIR /src
 
 RUN cargo build --release
 
-FROM debian:buster-slim
+FROM debian:bullseye-slim
 COPY --from=builder /src/target/release/grading-scheduler /app/
 
 CMD [ "/app/grading-scheduler" ]
