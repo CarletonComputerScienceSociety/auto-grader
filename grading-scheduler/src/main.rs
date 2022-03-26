@@ -17,10 +17,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let deployment_count: Arc<Mutex<i32>> = Arc::new(Mutex::new(0));
 
     let hello = warp::path!("hello").map(move || {
-        println!("registered");
-
+        
         let mut count = deployment_count.lock().unwrap();
         *count += 1;
+        println!("Registered {} deployments", *count);
 
         format!("Registered {} deployments", *count)
     });
