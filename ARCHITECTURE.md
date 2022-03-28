@@ -20,23 +20,63 @@ libraries.
 
 ### grading-scheduler
 
-This entire system runs on several VMs in the School of Computer Science
-OpenStack. Nomad is used to orchestrate the scheduler, and more importantly, the
-runners.
-
-The reason for this more intricate setup is that running the grading system on a
-single node leads to congested processing closer to when an assignment is due.
-This process can scale nicely across several different machines to mitigate this
-issue. Further, Nomad allows you to set a max amount of compute/ram for specific
-jobs, which can be helpful to make sure that students get the same speed of
-execution regardless of how many other students are also trying to submit their
-code at that time.
-
 ```mermaid
     graph TD;
         Scheduler-->Runner1;
         Scheduler-->Runner2;
         Scheduler-->Runner3;
+```
+
+A single scheduler will manage all runners for any assignment at Carleton. It's
+single purpose is to receive a task to execute, and figure out how to execute
+it. It will also support different "flavours" of runner, for if certain courses
+require reduced resouces that are greater or less than the standard. For
+example, 2402 might want students to have access to 100cpu/256mb ram, while 2404
+could want 1000/1024.
+
+This entire system runs on several VMs in the School of Computer Science
+OpenStack. Nomad is used to orchestrate the scheduler, and more importantly, the
+runners.
+
+The reason for this more intricate setup is that running the grading system on a
+single node leads to congested processing closer to when an assignment is due,
+as more students are simultaneously submitting jobs. This process can scale
+nicely across several different machines to mitigate this issue. Further, Nomad
+allows you to set a max amount of compute/ram for specific jobs, which can be
+helpful to make sure that students get the same speed of execution regardless of
+how many other students are also trying to submit their code at that time.
+
+```mermaid
+stateDiagram-v2    
+
+    state VM2 {
+
+        Runner4
+        Runner5
+
+        Scheduler --> Runner4
+        Scheduler --> Runner5
+    }
+
+    state VM3 {
+
+        Runner6
+        Runner7
+
+        Scheduler --> Runner6
+        Scheduler --> Runner7
+    }
+
+    state VM1 {
+
+        Runner1
+        Runner2
+        Runner3
+
+        Scheduler --> Runner1
+        Scheduler --> Runner2
+        Scheduler --> Runner3
+    }
 ```
 
 Both the scheduler and the runners are written in Rust. The reason for this is
@@ -89,3 +129,31 @@ sequenceDiagram
 This crate stores all of the types that are relevant to both the scheduler and
 the runner. Since both use this crate, synchronicity of data is guaranteed when
 both are deployed.
+
+### Web frontend (TODO)
+
+The web frontend will have two sides; the student submission side, and the
+instructor/TA management side.
+
+#### Instructor view
+
+- Add a new assignment
+- Make changes to an assignment spec
+- Regrade all most-recent submissions
+- Add tests for an assignment
+
+#### Student view
+
+- Sign in, see courses that are on platform
+- See previous assignment submission's results
+- Submit a new iteration of an assignment
+
+#### Nice-to-haves
+
+- Telemetry of the platform
+- Progress bars
+
+### Web backend (TODO)
+
+- Handle accounts
+- Handle state of assignments
