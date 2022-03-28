@@ -1,35 +1,32 @@
 use std::sync::{Arc, Mutex};
 
 use nomad_client::apis::{configuration::Configuration, nodes_api::get_nodes};
-use warp::Filter;
+use reqwest::{
+    multipart::{self, Part},
+    Body,
+};
+use tokio::fs::File;
+use tokio_util::codec::{BytesCodec, FramedRead};
+use warp::{Filter, Rejection, Reply};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    tokio::spawn(async move {
-        match initialize_runners().await {
-            Ok(_) => println!("Successfully initialized runners"),
-            Err(e) => println!("Failed to initialize runners: {}", e),
-        };
-    });
+    // tokio::spawn(async move {
+    //     match initialize_runners().await {
+    //         Ok(_) => println!("Successfully initialized runners"),
+    //         Err(e) => println!("Failed to initialize runners: {}", e),
+    //     };
+    // });
 
-    // Get each deployment to register with the main node
+    // Path to register a new runner
+    let register = warp::path!("register").and(warp::get()).and_then(register);
 
-    let deployment_count: Arc<Mutex<i32>> = Arc::new(Mutex::new(0));
-
-    let hello = warp::path!("hello").map(move || {
-        
-        let mut count = deployment_count.lock().unwrap();
-        *count += 1;
-        println!("Registered {} deployments", *count);
-
-        format!("Registered {} deployments", *count)
-    });
-
-    warp::serve(hello).run(([0, 0, 0, 0], 4000)).await;
+    warp::serve(register).run(([0, 0, 0, 0], 5000)).await;
 
     Ok(())
 }
 
+// Initialize stuff on Nomad
 async fn initialize_runners() -> Result<(), Box<dyn std::error::Error>> {
     // Make sure the job is deployed
     // Make sure the job has the right number of instances
@@ -43,4 +40,26 @@ async fn initialize_runners() -> Result<(), Box<dyn std::error::Error>> {
     let _nodes = get_nodes(&config, namespace, region, index, wait, prefix).await?;
 
     Ok(())
+}
+
+async fn register() -> Result<impl Reply, Rejection> {
+    let client = reqwest::Client::new();
+
+    // Since we're sending from an async context, we have to do some interesting
+    // things with wrapping the file in some stream. Should probably look into
+    // this later.
+    let file = File::open("../grading-runner/tests/java/HelloWorld.java")
+        .await
+        .unwrap();
+    let stream = FramedRead::new(file, BytesCodec::new());
+    let body = Body::wrap_stream(stream);
+
+    // Make a request back
+    let res = client
+        .post("http://localhost:5001/job")
+        .body(body)
+        .send()
+        .await;
+
+    Ok("success")
 }

@@ -3,4 +3,5 @@ resolver = "2"
 members = [
     "grading-runner",
     "grading-scheduler",
+    "grading-schema",
 ]
