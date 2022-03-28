@@ -14,8 +14,8 @@ impl Handler for Java {
 
         // Run Java code
         let output = Command::new("java")
-            .arg("-classfile")
-            .arg("/tests/java/")
+            .arg("-cp")
+            .arg("/opt/tests/java/")
             .arg("HelloWorld")
             .output()
             .expect("failed to execute process");

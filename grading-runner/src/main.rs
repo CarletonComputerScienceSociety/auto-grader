@@ -16,7 +16,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         // Make sure the Python script returns the correct output
         let python_output = Python::handle(&Request {
-            file_location: "/tests/python/main.py".to_string(),
+            file_location: "/opt/tests/python/main.py".to_string(),
         });
 
         dbg!(python_output.clone());
@@ -25,7 +25,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         // Make sure the Java code returns the correct output
         let java_output = Java::handle(&Request {
-            file_location: "/tests/java/HelloWorld.java".to_string(),
+            file_location: "/opt/tests/java/HelloWorld.java".to_string(),
         });
 
         dbg!(java_output.clone());
