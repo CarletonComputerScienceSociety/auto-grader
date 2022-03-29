@@ -45,6 +45,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .send()
         .await;
 
+    // Print the response body
+    println!("{:?}", res.unwrap().text().await.unwrap());
+
     // Wait for server thread to finish
     server_thread.await?;
 
