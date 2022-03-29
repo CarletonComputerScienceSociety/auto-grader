@@ -4,25 +4,12 @@ use std::{
     sync::{Arc, Condvar, Mutex},
 };
 
+use grading_schema::{Job, Language};
 use nomad_client::apis::{configuration::Configuration, nodes_api::get_nodes};
 use serde::{Deserialize, Serialize};
 use warp::{http::Response, Filter, Rejection, Reply};
 
 type RunnerAddress = String;
-
-#[derive(Serialize, Deserialize)]
-pub enum Language {
-    Java,
-    Python,
-    C,
-    Cpp,
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct Job {
-    pub file_data: Vec<u8>,
-    pub file_type: Language,
-}
 
 pub struct JobPool {
     runners: Mutex<Option<VecDeque<Job>>>,
@@ -61,26 +48,15 @@ impl JobPool {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // tokio::spawn(async move {
-    //     match initialize_runners().await {
-    //         Ok(_) => println!("Successfully initialized runners"),
-    //         Err(e) => println!("Failed to initialize runners: {}", e),
-    //     };
-    // });
-
-    let runner_pool: Arc<Mutex<VecDeque<RunnerAddress>>> = Arc::new(Mutex::new(VecDeque::new()));
-
     let job_pool = Arc::new(JobPool::new());
 
-    // Add some job
-    for i in 0..100 {
+    // Add some jobs
+    for _ in 0..100 {
         job_pool.add_job(Job {
             file_data: vec![1, 2, 3],
             file_type: Language::Java,
         });
     }
-
-    // Start a thread to manage the runner pool
 
     // Path to register a new runner
     let register = warp::path!("register").and(warp::get()).map(move || {
@@ -88,6 +64,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         // Get a job
         loop {
+            // This will cause long polling. Until there is a job that is
+            // atomically returned, the runner will stay connected and wait.
             let job = job_pool.get_job();
 
             if let None = job {
@@ -103,6 +81,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     });
 
+    // Start the server
     warp::serve(register).run(([0, 0, 0, 0], 5000)).await;
 
     Ok(())
@@ -123,20 +102,3 @@ async fn initialize_runners() -> Result<(), Box<dyn std::error::Error>> {
 
     Ok(())
 }
-
-// async fn register() -> Result<impl Reply, Rejection> {
-//     // Send a file in a blocking thread
-//     let handle = tokio::spawn({
-//         let client = reqwest::blocking::Client::new();
-
-//         let file = File::open("../grading-runner/tests/java/HelloWorld.java");
-
-//         // Make a request back
-//         let res = client.post("http://localhost:5001/job").body(file).send();
-//     });
-
-//     // Wait for the thread to finish
-//     let res = handle.await.unwrap();
-
-//     Ok("success")
-// }

@@ -1,7 +1,16 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Deserialize, Serialize)]
-struct Job {
-    name: String,
-    rate: u32,
+#[derive(Serialize, Deserialize)]
+pub enum Language {
+    Java,
+    Python,
+    C,
+    Cpp,
+}
+
+// TODO: Add ID field
+#[derive(Serialize, Deserialize)]
+pub struct Job {
+    pub file_data: Vec<u8>,
+    pub file_type: Language,
 }
