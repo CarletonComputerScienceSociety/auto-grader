@@ -1,14 +1,21 @@
-use std::process::Command;
+use std::{io::Write, process::Command};
 
-use super::{Handler, Request};
+use grading_schema::Job;
+
+use super::Handler;
 
 pub struct Python();
 
 impl Handler for Python {
-    fn handle(request: &Request) -> String {
+    fn handle(request: Job) -> String {
+        // Write the input to a file
+        let input_file_name = format!("HelloWorld.py");
+        let mut file = std::fs::File::create(input_file_name.clone()).unwrap();
+        file.write_all(&request.file_data).unwrap();
+
         // Run a Python script
         let output = Command::new("python")
-            .arg(request.file_location.clone())
+            .arg(input_file_name)
             .output()
             .expect("failed to execute process");
 

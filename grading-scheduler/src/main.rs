@@ -1,15 +1,11 @@
 use std::{
     collections::VecDeque,
-    fs::File,
     sync::{Arc, Condvar, Mutex},
 };
 
 use grading_schema::{Job, Language};
 use nomad_client::apis::{configuration::Configuration, nodes_api::get_nodes};
-use serde::{Deserialize, Serialize};
-use warp::{http::Response, Filter, Rejection, Reply};
-
-type RunnerAddress = String;
+use warp::{http::Response, Filter};
 
 pub struct JobPool {
     runners: Mutex<Option<VecDeque<Job>>>,
@@ -51,10 +47,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let job_pool = Arc::new(JobPool::new());
 
     // Add some jobs
-    for _ in 0..100 {
+    for _ in 0..1000 {
         job_pool.add_job(Job {
-            file_data: vec![1, 2, 3],
-            file_type: Language::Java,
+            file_data: "print(\"Hello, World!\")".as_bytes().to_vec(),
+            file_type: Language::Python,
         });
     }
 
@@ -88,7 +84,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 // Initialize stuff on Nomad
-async fn initialize_runners() -> Result<(), Box<dyn std::error::Error>> {
+async fn _initialize_runners() -> Result<(), Box<dyn std::error::Error>> {
     // Make sure the job is deployed
     // Make sure the job has the right number of instances
     let config = Configuration::new();

@@ -1,6 +1,8 @@
 # Architecture
 
-## Purpose
+This document gives an overvie 
+
+# Purpose
 
 Within Computer Science at Carleton, several courses will grade students by
 running tests on their code, and verifying that tests complete properly. Some of
@@ -16,9 +18,9 @@ across several VMs as to not be limited by the resources of a single machine.
 This document breaks down this application by "crate"; Rust's equivalent of
 libraries.
 
-## Crates
+# Crates
 
-### grading-scheduler
+## grading-scheduler
 
 ```mermaid
     graph TD;
@@ -84,7 +86,7 @@ the ease of writing code that works in the async/threaded context of this
 project. Further, it's easy to make sure that types are safe across the network.
 Most importantly, Rust (🚀) is fun!
 
-### grading-runner
+## grading-runner
 
 Each runner is made up of a binary running in a Docker container that has
 language toolchains installed for Java, Python, and C/C++. This binary will, in
@@ -98,7 +100,7 @@ order:
 At this point, the runner will be killed by the scheduler. See the diagram below
 for a full
 
-#### Lifetime of a runner
+### Lifetime of a runner
 
 Runners are valid from the point they register with the scheduler until the
 point that they finish execution on a single job. At that point, they need to be
@@ -124,36 +126,36 @@ sequenceDiagram
     note right of Scheduler: Now that the job is done, the scheduler kills the runner and a new one is started
 ```
 
-### grading-schema
+## grading-schema
 
 This crate stores all of the types that are relevant to both the scheduler and
 the runner. Since both use this crate, synchronicity of data is guaranteed when
 both are deployed.
 
-### Web frontend (TODO)
+## Web frontend (TODO)
 
 The web frontend will have two sides; the student submission side, and the
 instructor/TA management side.
 
-#### Instructor view
+### Instructor view
 
 - Add a new assignment
 - Make changes to an assignment spec
 - Regrade all most-recent submissions
 - Add tests for an assignment
 
-#### Student view
+### Student view
 
 - Sign in, see courses that are on platform
 - See previous assignment submission's results
 - Submit a new iteration of an assignment
 
-#### Nice-to-haves
+### Nice-to-haves
 
 - Telemetry of the platform
 - Progress bars
 
-### Web backend (TODO)
+## Web backend (TODO)
 
 - Handle accounts
 - Handle state of assignments

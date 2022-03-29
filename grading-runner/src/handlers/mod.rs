@@ -1,10 +1,12 @@
+use grading_schema::Job;
+
 pub mod java;
 pub mod python;
 
-pub struct Request {
+pub struct _Request {
     pub file_location: String,
 }
 
 pub trait Handler {
-    fn handle(request: &Request) -> String;
+    fn handle(job: Job) -> String;
 }

@@ -1,21 +1,29 @@
-use std::process::Command;
+use std::{process::Command, io::Write};
 
-use super::{Handler, Request};
+use grading_schema::Job;
+
+use super::{Handler};
 
 pub struct Java();
 
 impl Handler for Java {
-    fn handle(request: &Request) -> String {
+    fn handle(request: Job) -> String {
+        // Write the input to a file
+        let input_file_name = format!("HelloWorld.java");
+
+        let mut file = std::fs::File::create(input_file_name.clone()).unwrap();
+        file.write_all(&request.file_data).unwrap();
+
         // Compile Java code
-        let output = Command::new("javac")
-            .arg(request.file_location.clone())
+        let _output = Command::new("javac")
+            .arg(input_file_name)
             .output()
             .expect("failed to execute process");
 
         // Run Java code
         let output = Command::new("java")
             .arg("-cp")
-            .arg("/opt/tests/java/")
+            .arg("/opt/")
             .arg("HelloWorld")
             .output()
             .expect("failed to execute process");

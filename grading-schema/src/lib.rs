@@ -4,8 +4,8 @@ use serde::{Deserialize, Serialize};
 pub enum Language {
     Java,
     Python,
-    C,
-    Cpp,
+    // C,
+    // Cpp,
 }
 
 // TODO: Add ID field

@@ -1,15 +1,14 @@
-use std::{convert::Infallible, process::Command, time::Duration};
+use std::convert::Infallible;
 
 use bytes::BufMut;
 use futures::TryStreamExt;
-use handlers::{java::Java, python::Python, Handler, Request};
-use serde::{Deserialize, Serialize};
-use tokio::time::sleep;
+use grading_schema::{Job, Language};
+use handlers::{java::Java, python::Python, Handler};
 use uuid::Uuid;
 use warp::{
     http::StatusCode,
     multipart::{FormData, Part},
-    Filter, Rejection, Reply,
+    Rejection, Reply,
 };
 
 mod handlers;
@@ -19,76 +18,27 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Send a get request to the server
     let client = reqwest::Client::new();
 
-    // When the server gets a request, start the task
-
-    // Start a thread with the server
-    let server_thread = tokio::spawn(async move {
-        let upload_route = warp::path!("job")
-            .and(warp::post())
-            // Accept a file
-            .and(warp::multipart::form().max_length(5 * 1024 * 1024))
-            // Accept a job
-            // .and(warp::body::content_length_limit(4 * 1024))
-            // .and(warp::body::json())
-            .and_then(upload);
-
-        let download_route = warp::path("files").and(warp::fs::dir("./files/"));
-
-        let router = upload_route.or(download_route).recover(handle_rejection);
-
-        warp::serve(router).run(([0, 0, 0, 0], 5001)).await;
-    });
-
-    // Register as a runner
+    // Get a job from the scheduler
     let res = client
         .get("http://192.168.1.102:5000/register")
         .send()
         .await;
 
-    // Print the response body
-    println!("{:?}", res.unwrap().text().await.unwrap());
+    let job = serde_json::from_str::<Job>(res.unwrap().text().await.unwrap().as_str()).unwrap();
 
-    // Wait for server thread to finish
-    server_thread.await?;
+    // Run the job
+    let output = match job.file_type {
+        Language::Java => Java::handle(job),
+        Language::Python => Python::handle(job),
+    };
 
-    // loop {
-    //     sleep(Duration::from_millis(1000)).await;
-    //     let res = client.get("http://192.168.1.102:5000/hello").send().await;
-
-    //     // Make sure the Python script returns the correct output
-    //     let python_output = Python::handle(&Request {
-    //         file_location: "/opt/tests/python/main.py".to_string(),
-    //     });
-
-    //     dbg!(python_output.clone());
-
-    //     assert!(python_output == "Hello, World!\n");
-
-    //     // Make sure the Java code returns the correct output
-    //     let java_output = Java::handle(&Request {
-    //         file_location: "/opt/tests/java/HelloWorld.java".to_string(),
-    //     });
-
-    //     dbg!(java_output.clone());
-
-    //     assert!(java_output == "Hello, World!\n");
-
-    //     // Handle the response
-    //     match res {
-    //         Ok(res) => {
-    //             // println!("Response: {}", res.text().await?);
-    //         }
-    //         Err(e) => {
-    //             println!("Error: {}", e);
-    //         }
-    //     }
-    // }
+    println!("{}", output);
 
     Ok(())
 }
 
 // From https://blog.logrocket.com/file-upload-and-download-in-rust/
-async fn upload(form: FormData) -> Result<impl Reply, Rejection> {
+async fn _upload(form: FormData) -> Result<impl Reply, Rejection> {
     // dbg!(form);
 
     // return Ok("success");
@@ -152,7 +102,7 @@ async fn upload(form: FormData) -> Result<impl Reply, Rejection> {
 }
 
 // From https://blog.logrocket.com/file-upload-and-download-in-rust/
-async fn handle_rejection(err: Rejection) -> std::result::Result<impl Reply, Infallible> {
+async fn _handle_rejection(err: Rejection) -> std::result::Result<impl Reply, Infallible> {
     let (code, message) = if err.is_not_found() {
         (StatusCode::NOT_FOUND, "Not Found".to_string())
     } else if err.find::<warp::reject::PayloadTooLarge>().is_some() {
