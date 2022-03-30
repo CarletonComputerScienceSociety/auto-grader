@@ -19,16 +19,38 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = reqwest::Client::new();
 
     // Get the env var of the hostname
-    let scheduler_hostname =
-        std::env::var("SCHEDULER_HOSTNAME").unwrap_or("localhost".to_string());
+    let scheduler_hostname = std::env::var("SCHEDULER_HOSTNAME").unwrap_or("localhost".to_string());
 
-    // Get a job from the scheduler
-    let res = client
-        .get(&format!("http://{}:4000/register", scheduler_hostname))
-        .send()
-        .await;
+    let job;
 
-    let job = serde_json::from_str::<Job>(res.unwrap().text().await.unwrap().as_str()).unwrap();
+    loop {
+        // Get a job from the scheduler
+        let res = client
+            .get(&format!("http://{}:4000/register", scheduler_hostname))
+            .send()
+            .await;
+
+        // Make sure the request was successful
+        match res {
+            Ok(response) => {
+                job = match serde_json::from_str::<Job>(
+                    response.text().await.unwrap_or("".to_string()).as_str(),
+                ) {
+                    Ok(job) => job,
+                    Err(e) => {
+                        println!("{}", e);
+                        continue;
+                    }
+                };
+                break;
+            }
+            Err(err) => {
+                println!("Couldn't get job\n{}", err);
+                std::thread::sleep(std::time::Duration::from_secs(1));
+                continue;
+            }
+        }
+    }
 
     // Run the job
     let output = match job.file_type {
