@@ -23,6 +23,6 @@ RUN apt-get update \
         # Java
         openjdk-11-jdk
 
-COPY tests /tests
+COPY grading-runner/tests /tests
 
 CMD [ "/app/grading-runner" ]
