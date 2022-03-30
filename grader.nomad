@@ -3,8 +3,9 @@ job "grader8" {
 
   group "scheduler" {
     network {
+      mode = "bridge"
       port "backend" {
-        static = 4000
+        to = 4000
       }
     }
 
@@ -12,18 +13,8 @@ job "grader8" {
       name = "grading-scheduler"
       port = "backend"
 
-      check {
-        type     = "http"
-        port     = "backend"
-        path     = "/hello"
-        interval = "5s"
-        timeout  = "2s"
-
-        check_restart {
-          limit           = 3
-          grace           = "30s"
-          ignore_warnings = false
-        }
+      connect {
+        sidecar_service {}
       }
     }
 
@@ -36,7 +27,7 @@ job "grader8" {
       }
 
       resources {
-        cpu    = 4000
+        cpu    = 5000
         memory = 1000
       }
     }
@@ -44,6 +35,25 @@ job "grader8" {
 
   group "runners" {
     count = 3
+
+    network {
+      mode = "bridge"
+    }
+
+      service {
+        name = "grading-runner"
+
+        connect {
+          sidecar_service {
+            proxy {
+              upstreams {
+                destination_name = "grading-scheduler"
+                local_bind_port  = 4000
+              }
+            }
+          }
+        }
+      }
 
     task "runner" {
       driver = "docker"
@@ -53,8 +63,8 @@ job "grader8" {
       }
 
       resources {
-        cpu    = 10
-        memory = 15
+        cpu    = 1000
+        memory = 1000
       }
     }
   }

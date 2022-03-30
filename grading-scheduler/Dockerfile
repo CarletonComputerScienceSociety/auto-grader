@@ -2,7 +2,7 @@ FROM rust:1.59 as builder
 
 COPY . /src
 
-WORKDIR /src
+WORKDIR /src/grading-scheduler
 
 RUN cargo build --release
 

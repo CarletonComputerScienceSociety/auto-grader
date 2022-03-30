@@ -51,6 +51,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         job_pool.add_job(Job {
             file_data: "print(\"Hello, World!\")".as_bytes().to_vec(),
             file_type: Language::Python,
+            file_name: "HelloWorld.py".to_string(),
         });
     }
 

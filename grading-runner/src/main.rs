@@ -18,9 +18,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Send a get request to the server
     let client = reqwest::Client::new();
 
+    // Get the env var of the hostname
+    let scheduler_hostname =
+        std::env::var("SCHEDULER_HOSTNAME").unwrap_or("localhost".to_string());
+
     // Get a job from the scheduler
     let res = client
-        .get("http://192.168.1.102:5000/register")
+        .get(&format!("http://{}:4000/register", scheduler_hostname))
         .send()
         .await;
 

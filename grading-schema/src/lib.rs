@@ -13,4 +13,5 @@ pub enum Language {
 pub struct Job {
     pub file_data: Vec<u8>,
     pub file_type: Language,
+    pub file_name: String,
 }
