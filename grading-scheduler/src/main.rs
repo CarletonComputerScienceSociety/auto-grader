@@ -47,13 +47,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let job_pool = Arc::new(JobPool::new());
 
     // Add some jobs
-    for _ in 0..1000 {
+    for _ in 0..100_000 {
         job_pool.add_job(Job {
             file_data: "print(\"Hello, World!\")".as_bytes().to_vec(),
             file_type: Language::Python,
             file_name: "HelloWorld.py".to_string(),
         });
     }
+
+    // Track the number of jobs dispatched
+    let num_jobs_dispatched: Arc<Mutex<u64>> = Arc::new(Mutex::new(0));
 
     // Path to register a new runner
     let register = warp::path!("register").and(warp::get()).map(move || {
@@ -69,7 +72,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 continue;
             }
 
-            println!("Runner dispatched");
+            let mut count = num_jobs_dispatched.lock().unwrap();
+            *count += 1;
+            println!("Runner {} dispatched", count);
 
             return Response::builder()
                 .status(200)
