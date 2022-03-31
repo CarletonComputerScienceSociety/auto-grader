@@ -1,6 +1,11 @@
 [MASTER]
 load-plugins=pylint_django, pylint_celery
 django-settings-module=config.settings.base
+disable=
+    C0114, # missing-module-docstring
+    missing-docstring, # missing-docstring
+    E1101,
+
 [FORMAT]
 max-line-length=120
 

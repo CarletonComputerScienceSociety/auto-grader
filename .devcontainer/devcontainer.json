@@ -26,9 +26,20 @@
 
 	// Add the IDs of extensions you want installed when the container is created.
 	"extensions": [
+		"eamodio.gitlens",
+		"esbenp.prettier-vscode",
+		"github.copilot",
 		"ms-python.python",
-		"ms-python.vscode-pylance"
-	],
+		"ms-python.vscode-pylance",
+		"ms-vsliveshare.vsliveshare",
+		"mtxr.sqltools-driver-pg",
+		"mtxr.sqltools",
+		"ninoseki.vscode-pylens",
+		"pflannery.vscode-versionlens",
+		"robbowen.synthwave-vscode",
+		"usernamehw.errorlens",
+		"GitHub.vscode-pull-request-github"
+	  ],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// This can be used to network with other containers or the host.
