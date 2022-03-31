@@ -13,6 +13,10 @@ class UploadViewSet(ViewSet):
 
     def create(self, request):
         file_uploaded = request.FILES.get('file_uploaded')
+        print(file_uploaded)
         content_type = file_uploaded.content_type
         response = "POST API and you have uploaded a {} file".format(content_type)
+
+        # Send request to scheduler
+
         return Response(response)
