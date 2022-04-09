@@ -4,4 +4,5 @@ members = [
     "grading-runner",
     "grading-scheduler",
     "grading-schema",
+    "grading-frontend",
 ]

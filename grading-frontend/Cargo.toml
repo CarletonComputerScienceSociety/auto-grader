@@ -1,0 +1,17 @@
+[package]
+name = "grading-frontend"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+dioxus = { version = "0.2.3", features = ["web"] }
+reqwest = { version = "0.11.8", features = ["json"] }
+serde = { version = "1.0.132", features = ["derive"] }
+web-sys = { version = "0.3.56", features = ["FileReader", "Request", "RequestInit"] }
+
+# Logging
+log = "0.4.14"
+wasm-logger = "0.2.0"
+wasm-bindgen-futures = "0.4.29"
