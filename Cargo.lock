@@ -310,6 +310,7 @@ dependencies = [
 name = "grading-scheduler"
 version = "0.1.0"
 dependencies = [
+ "bytes",
  "futures",
  "grading-schema",
  "nomad-client",
@@ -318,6 +319,7 @@ dependencies = [
  "serde_json",
  "tokio",
  "tokio-util 0.7.0",
+ "uuid",
  "warp",
 ]
 

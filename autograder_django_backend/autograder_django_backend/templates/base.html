@@ -121,16 +121,6 @@
   with a "defer" so that you run inline code:
   <script>
     window.addEventListener('DOMContentLoaded', () => {/* Run whatever you want */ });
-
-    // Function to upload file from form
-    function uploadFile(file) {
-      const formData = new FormData();
-      formData.append('file', file);
-      fetch('/api/assignments/upload', {
-        method: 'POST',
-        body: formData,
-      });
-    }
   </script>
   {% endcomment %}
   {% endblock inline_javascript %}
