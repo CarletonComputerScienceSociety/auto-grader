@@ -1,5 +1,5 @@
 [package]
-name = "grading-schema"
+name = "autograder_rust_schema"
 version = "0.1.0"
 edition = "2021"
 

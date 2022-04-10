@@ -9,6 +9,46 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d468802bab17cbc0cc575e9b053f41e72aa36bfa6b7f55e3529ffa43161b97fa"
 
 [[package]]
+name = "autograder_rust_runner"
+version = "0.1.0"
+dependencies = [
+ "autograder_rust_schema",
+ "bytes",
+ "futures",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "tokio",
+ "uuid",
+ "warp",
+]
+
+[[package]]
+name = "autograder_rust_scheduler"
+version = "0.1.0"
+dependencies = [
+ "autograder_rust_schema",
+ "bytes",
+ "futures",
+ "nomad-client",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tokio-util 0.7.0",
+ "uuid",
+ "warp",
+]
+
+[[package]]
+name = "autograder_rust_schema"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "base64"
 version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -289,46 +329,6 @@ dependencies = [
  "cfg-if",
  "libc",
  "wasi 0.10.2+wasi-snapshot-preview1",
-]
-
-[[package]]
-name = "grading-runner"
-version = "0.1.0"
-dependencies = [
- "bytes",
- "futures",
- "grading-schema",
- "reqwest",
- "serde",
- "serde_json",
- "tokio",
- "uuid",
- "warp",
-]
-
-[[package]]
-name = "grading-scheduler"
-version = "0.1.0"
-dependencies = [
- "bytes",
- "futures",
- "grading-schema",
- "nomad-client",
- "reqwest",
- "serde",
- "serde_json",
- "tokio",
- "tokio-util 0.7.0",
- "uuid",
- "warp",
-]
-
-[[package]]
-name = "grading-schema"
-version = "0.1.0"
-dependencies = [
- "serde",
- "serde_json",
 ]
 
 [[package]]

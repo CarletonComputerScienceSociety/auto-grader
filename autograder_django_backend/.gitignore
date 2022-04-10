@@ -274,6 +274,6 @@ autograder_django_backend/media/
 
 .pytest_cache/
 .ipython/
-.env
+# .env
 .envs/*
 !.envs/.local/

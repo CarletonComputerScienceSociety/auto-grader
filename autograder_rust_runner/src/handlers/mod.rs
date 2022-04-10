@@ -1,4 +1,4 @@
-use grading_schema::Job;
+use autograder_rust_schema::Job;
 
 pub mod java;
 pub mod python;

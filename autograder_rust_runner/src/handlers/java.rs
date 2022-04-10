@@ -1,6 +1,6 @@
 use std::{process::Command, io::Write};
 
-use grading_schema::Job;
+use autograder_rust_schema::Job;
 
 use super::{Handler};
 

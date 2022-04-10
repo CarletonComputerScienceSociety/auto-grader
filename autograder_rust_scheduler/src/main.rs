@@ -5,7 +5,7 @@ use std::{
 
 use bytes::BufMut;
 use futures::TryStreamExt;
-use grading_schema::{Job, Language};
+use autograder_rust_schema::{Job, Language};
 use nomad_client::apis::{configuration::Configuration, nodes_api::get_nodes};
 use reqwest::StatusCode;
 use uuid::Uuid;

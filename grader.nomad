@@ -23,7 +23,7 @@ job "grader8" {
       }
 
       env {
-        test = "test4"
+        test = "test5"
       }
 
       resources {
@@ -34,7 +34,7 @@ job "grader8" {
   }
 
   group "runners" {
-    count = 3
+    count = 30
 
     network {
       mode = "bridge"
@@ -63,12 +63,12 @@ job "grader8" {
       }
 
       env {
-        test = "test4"
+        test = "test5"
       }
 
       resources {
-        cpu    = 1000
-        memory = 1000
+        cpu    = 100
+        memory = 100
       }
 
       # Allow for as many restarts as is needed, since a restart is just a

@@ -2,7 +2,7 @@ use std::convert::Infallible;
 
 use bytes::BufMut;
 use futures::TryStreamExt;
-use grading_schema::{Job, Language};
+use autograder_rust_schema::{Job, Language};
 use handlers::{java::Java, python::Python, Handler};
 use uuid::Uuid;
 use warp::{

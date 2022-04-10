@@ -1,5 +1,5 @@
 [package]
-name = "grading-scheduler"
+name = "autograder_rust_scheduler"
 version = "0.1.0"
 edition = "2021"
 
@@ -8,7 +8,7 @@ edition = "2021"
 [dependencies]
 
 # Schema
-grading-schema = { path = "../grading-schema" }
+autograder_rust_schema = { path = "../autograder_rust_schema" }
 
 # Tokio
 tokio-util = { version = "0.7.0", features = ["codec"] }

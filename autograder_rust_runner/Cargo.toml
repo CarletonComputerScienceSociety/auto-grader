@@ -1,5 +1,5 @@
 [package]
-name = "grading-runner"
+name = "autograder_rust_runner"
 version = "0.1.0"
 edition = "2021"
 
@@ -15,4 +15,4 @@ bytes = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 
-grading-schema = { path = "../grading-schema" }
+autograder_rust_schema = { path = "../autograder_rust_schema" }
