@@ -1,11 +1,12 @@
 use std::{
     collections::VecDeque,
-    sync::{Arc, Condvar, Mutex}, convert::Infallible,
+    convert::Infallible,
+    sync::{Arc, Condvar, Mutex},
 };
 
+use autograder_rust_schema::{Job, Language};
 use bytes::BufMut;
 use futures::TryStreamExt;
-use autograder_rust_schema::{Job, Language};
 use nomad_client::apis::{configuration::Configuration, nodes_api::get_nodes};
 use reqwest::StatusCode;
 use uuid::Uuid;
@@ -72,6 +73,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Track the number of jobs dispatched
     let num_jobs_dispatched: Arc<Mutex<u64>> = Arc::new(Mutex::new(0));
 
+    let job_pool_clone = job_pool.clone();
+
     // Path to register a new runner
     let register = warp::path!("register").and(warp::get()).map(move || {
         println!("Runner has registered");
@@ -80,7 +83,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         loop {
             // This will cause long polling. Until there is a job that is
             // atomically returned, the runner will stay connected and wait.
-            let job = job_pool.get_job();
+            let job = job_pool_clone.get_job();
 
             if job.is_none() {
                 continue;
@@ -97,15 +100,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     });
 
+    let job_pool_clone = job_pool.clone();
+
     // Path to add a job
     let add_job = warp::path!("add_job")
         .and(warp::post())
         .and(warp::multipart::form().max_length(5 * 1024 * 1024))
-        .and_then(move |form: FormData| {
+        .and(with_job_pool(job_pool_clone))
+        .and_then(upload);
 
-        });
-
-    let routes = register.or(add_job).recover(handle_rejection);
+    let routes = register.or(add_job);
 
     // Start the server
     warp::serve(routes).run(([0, 0, 0, 0], 4000)).await;
@@ -114,7 +118,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 // Refereence: https://github.com/seanmonstar/warp/blob/3ff2eaf41eb5ac9321620e5a6434d5b5ec6f313f/examples/todos.rs#L99
-fn with_job_pool(job_pool: Arc<JobPool>) -> impl Filter<Extract = (JobPool,), Error = std::convert::Infallible> + Clone {
+fn with_job_pool(
+    job_pool: Arc<JobPool>,
+) -> impl Filter<Extract = (Arc<JobPool>,), Error = std::convert::Infallible> + Clone {
     warp::any().map(move || job_pool.clone())
 }
 
@@ -134,35 +140,41 @@ async fn _initialize_runners() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-async fn upload(form: FormData) -> Result<impl Reply, Rejection> {
+async fn upload(form: FormData, job_pool: Arc<JobPool>) -> Result<impl Reply, Rejection> {
     let parts: Vec<Part> = form.try_collect().await.map_err(|e| {
         eprintln!("form error: {}", e);
         warp::reject::reject()
     })?;
 
-    for p in parts {
-        if p.name() == "file" {
-            let content_type = p.content_type();
-            let file_ending;
-            match content_type {
-                Some(file_type) => match file_type {
-                    "application/pdf" => {
-                        file_ending = "pdf";
-                    }
-                    "image/png" => {
-                        file_ending = "png";
-                    }
-                    v => {
-                        eprintln!("invalid file type found: {}", v);
-                        return Err(warp::reject::reject());
-                    }
-                },
-                None => {
-                    eprintln!("file type could not be determined");
-                    return Err(warp::reject::reject());
-                }
-            }
+    println!("{:?}", parts);
 
+    for p in parts {
+        if p.name() == "file_uploaded" {
+            let content_type = p.content_type();
+            let file_ending: &str;
+
+            println!("Getting the content type");
+
+            // match content_type {
+            //     // Make sure the file is some type of archive
+            //     Some(file_type) => match file_type {
+            //         "application/zip" => {
+            //             file_ending = "zip";
+            //         }
+            //         v => {
+            //             eprintln!("invalid file type found: {}", v);
+            //             return Err(warp::reject::reject());
+            //         }
+            //     },
+            //     None => {
+            //         eprintln!("file type could not be determined: {:?}", content_type);
+            //         return Err(warp::reject::reject());
+            //     }
+            // }
+
+            println!("Getting the file data");
+
+            // Get the file from the part
             let value = p
                 .stream()
                 .try_fold(Vec::new(), |mut vec, data| {
@@ -175,7 +187,9 @@ async fn upload(form: FormData) -> Result<impl Reply, Rejection> {
                     warp::reject::reject()
                 })?;
 
-            let file_name = format!("./files/{}.{}", Uuid::new_v4(), file_ending);
+            println!("Writing the file to disk");
+
+            let file_name = format!("./files/{}.{}", Uuid::new_v4(), "zip");
             tokio::fs::write(&file_name, value).await.map_err(|e| {
                 eprint!("error writing file: {}", e);
                 warp::reject::reject()
