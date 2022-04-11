@@ -1,16 +1,14 @@
 <script lang="ts">
-  let postVar;
   let fileVar;
 
   function submitForm() {
     event.preventDefault();
 
     const dataArray = new FormData();
-    dataArray.append("file_uploaded", fileVar);
+    dataArray.append("file_uploaded", fileVar[0]);
 
     fetch("http://localhost:8000/api/assignments/upload/", {
       method: "POST",
-      headers: [["Content-Type", "multipart/form-data"]],
       body: dataArray,
     })
       .then((response) => {
