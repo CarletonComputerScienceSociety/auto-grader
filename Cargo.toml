@@ -1,7 +1,7 @@
 [workspace]
 resolver = "2"
 members = [
-    "grading-runner",
-    "grading-scheduler",
-    "grading-schema",
+    "autograder_rust_runner",
+    "autograder_rust_scheduler",
+    "autograder_rust_schema",
 ]
