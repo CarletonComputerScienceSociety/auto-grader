@@ -24,6 +24,14 @@ class UploadViewSet(ViewSet):
         if content_type != 'application/zip':
             response = "Please upload a zip file"
         else:
+            # Add the job to the DB
+            
+
+            # Start a websocket connection with the scheduler
+
+            # Pass the ID of the job
+
+
             # Send request to scheduler
             url = 'http://localhost:4000/add_job'
             files = {'file_uploaded': file_uploaded}
