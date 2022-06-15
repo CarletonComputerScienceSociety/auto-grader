@@ -1,0 +1,25 @@
+name: Run checks
+
+on:
+  push:
+
+jobs:
+  django-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          cd autograder_django_backend
+          pip install -r requirements/local.txt
+
+      - name: Test through Pytest
+        run: |
+          cd autograder_django_backend
+          pytest
