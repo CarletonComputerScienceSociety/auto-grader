@@ -7,7 +7,8 @@ class Course(models.Model):
     description = models.TextField(blank=True)
     section = models.CharField(max_length=5)
     professor = models.ForeignKey(
-        "autograder.Professor", on_delete=models.CASCADE, related_name="courses")
+        "autograder.Professor", on_delete=models.CASCADE, related_name="courses"
+    )
 
     def get_students_from_course(self):
         return list(Student.objects.filter(courses=self))
@@ -22,13 +23,16 @@ class Assignment(models.Model):
     # uploaded professor test cases as a file
 
     course = models.ForeignKey(
-        "Course", on_delete=models.CASCADE, related_name="assignments")
+        "Course", on_delete=models.CASCADE, related_name="assignments"
+    )
 
 
 class Student(models.Model):
     name = models.CharField(max_length=100)
     email = models.EmailField()
-    assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE, related_name="students", null=True)
+    assignment = models.ForeignKey(
+        Assignment, on_delete=models.CASCADE, related_name="students", null=True
+    )
 
     courses = models.ManyToManyField(Course, related_name="students")
 
@@ -42,6 +46,7 @@ class Professor(models.Model):
 
     def get_students(self):
         return list(Student.objects.filter(courses__professor=self).all())
+
 
 # class Submission(models.Model):
 #     # students uploaded code as a field

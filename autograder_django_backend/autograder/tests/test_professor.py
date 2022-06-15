@@ -2,6 +2,7 @@ from django.test import TestCase
 import pytest
 from autograder.models import Course, Assignment, Professor, Student
 
+
 @pytest.mark.django_db(transaction=True)
 def test_get_students_of_professor():
     professor = Professor.objects.create(
