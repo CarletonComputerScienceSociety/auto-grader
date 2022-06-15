@@ -1,11 +1,12 @@
 from django.test import TestCase
 import pytest
 from autograder.models import Course, Assignment, Professor, Student
+from autograder.tests.factory import student_factory
 
 
 @pytest.mark.django_db(transaction=True)
 def test_student_get_all_professors():
-    student_one = Student.objects.create(
+    student_one = student_factory(
         name="Student One",
         email="studentone@test.com",
     )
