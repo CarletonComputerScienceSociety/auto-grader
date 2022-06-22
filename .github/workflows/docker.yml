@@ -28,7 +28,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
-          file: grading-runner/Dockerfile
+          file: autograder_rust_runner/Dockerfile
           push: true
           tags: |
             ghcr.io/angelonfira/rust-test-server/runner:latest
@@ -55,7 +55,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
-          file: grading-scheduler/Dockerfile
+          file: autograder_rust_scheduler/Dockerfile
           push: true
           tags: |
             ghcr.io/angelonfira/rust-test-server/scheduler:latest
