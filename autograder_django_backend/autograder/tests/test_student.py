@@ -2,6 +2,7 @@ from django.test import TestCase
 import pytest
 from autograder.models import Course, Assignment, Professor, Student
 from autograder.tests.factory import student_factory
+from autograder_django_backend.utils.tests import get_client
 
 
 @pytest.mark.django_db(transaction=True)
@@ -54,3 +55,26 @@ def test_student_get_all_professors():
 
     assert professor_one in list_of_professors
     assert professor_two in list_of_professors
+
+
+@pytest.mark.django_db(transaction=True)
+def test_create_student_api():
+    client, user = get_client()
+
+    response = client.post(
+        "/api/students/",
+        {
+            "name": "test_student",
+            "email": "test@test.com",
+        },
+        format="json",
+    )
+
+    print(response.data)
+
+    assert response.status_code == 201
+
+    assignment = Student.objects.get(name="test_student")
+
+    assert assignment.name == "test_student"
+    assert assignment.email == "test@test.com"

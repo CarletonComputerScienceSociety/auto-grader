@@ -3,7 +3,7 @@ import pytest
 from autograder.models import Course, Assignment, Professor, Student
 from autograder_django_backend.utils.tests import get_client
 
-# Test creating a course through the API
+# Test creating an assignment through the API
 @pytest.mark.django_db(transaction=True)
 def test_create_assignment_api():
     client, user = get_client()
