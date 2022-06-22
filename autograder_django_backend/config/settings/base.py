@@ -80,9 +80,7 @@ THIRD_PARTY_APPS = [
 
 LOCAL_APPS = [
     "autograder_django_backend.users",
-    "assignments",
     "autograder",
-    # Your stuff: custom apps go here
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
