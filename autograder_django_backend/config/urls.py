@@ -12,7 +12,7 @@ from rest_framework import permissions, routers
 from autograder.views import AssignmentViewSet
 
 router = routers.DefaultRouter(trailing_slash=True)
-router.register('assignments', AssignmentViewSet)
+router.register("assignments", AssignmentViewSet)
 
 
 urlpatterns = [

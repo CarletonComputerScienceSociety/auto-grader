@@ -295,7 +295,9 @@ ACCOUNT_FORMS = {"signup": "autograder_django_backend.users.forms.UserSignupForm
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
 SOCIALACCOUNT_ADAPTER = "autograder_django_backend.users.adapters.SocialAccountAdapter"
 # https://django-allauth.readthedocs.io/en/latest/forms.html
-SOCIALACCOUNT_FORMS = {"signup": "autograder_django_backend.users.forms.UserSocialSignupForm"}
+SOCIALACCOUNT_FORMS = {
+    "signup": "autograder_django_backend.users.forms.UserSocialSignupForm"
+}
 
 # django-rest-framework
 # -------------------------------------------------------------------------------
@@ -326,7 +328,10 @@ SPECTACULAR_SETTINGS = {
     "SERVE_PERMISSIONS": ["rest_framework.permissions.IsAdminUser"],
     "SERVERS": [
         {"url": "http://127.0.0.1:8000", "description": "Local Development server"},
-        {"url": "https://autograder.ccss.carleton.ca", "description": "Production server"},
+        {
+            "url": "https://autograder.ccss.carleton.ca",
+            "description": "Production server",
+        },
     ],
 }
 # Your stuff...

@@ -85,6 +85,9 @@ SPECTACULAR_SETTINGS = {
     "SERVE_PERMISSIONS": [],
     "SERVERS": [
         {"url": "http://127.0.0.1:8000", "description": "Local Development server"},
-        {"url": "https://autograder.ccss.carleton.ca", "description": "Production server"},
+        {
+            "url": "https://autograder.ccss.carleton.ca",
+            "description": "Production server",
+        },
     ],
 }
