@@ -1,6 +1,7 @@
 from django.test import TestCase
 import pytest
 from autograder.models import Course, Assignment, Professor, Student
+from autograder_django_backend.utils.tests import get_client
 
 
 @pytest.mark.django_db(transaction=True)
@@ -76,3 +77,30 @@ def test_get_students_of_course():
     assert student_one in list_of_students
     assert student_two in list_of_students
     assert student_three in list_of_students
+
+
+# Test creating a course through the API
+@pytest.mark.django_db(transaction=True)
+def test_create_course_api():
+    client, user = get_client()
+
+    professor = Professor.objects.create(name="test_professor", email="test@test.com")
+
+    response = client.post(
+        "/api/courses/",
+        {
+            "course_id": "COMP 2406",
+            "name": "Fundamentals of Web Applications",
+            "description": "Introduction to Internet application development; emphasis on computer science fundamentals of technologies underlying web applications. Topics include: scripting and functional languages, language-based virtual machines, database query languages, remote procedure calls over the Internet, and performance and security concerns in modern distributed applications.",
+            "section": "A",
+            "professor": professor.id,
+        },
+        format="json",
+    )
+
+    assert response.status_code == 201
+
+    assignment = Course.objects.get(course_id="COMP 2406")
+
+    assert assignment.course_id == "COMP 2406"
+    assert assignment.name == "Fundamentals of Web Applications"

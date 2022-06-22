@@ -34,7 +34,7 @@ class Student(models.Model):
         Assignment, on_delete=models.CASCADE, related_name="students", null=True
     )
 
-    courses = models.ManyToManyField(Course, related_name="students")
+    courses = models.ManyToManyField(Course, related_name="students", blank=True)
 
     def get_professors(self):
         return list(Professor.objects.filter(courses__in=self.courses.all()))
