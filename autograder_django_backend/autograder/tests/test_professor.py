@@ -1,25 +1,18 @@
 from django.test import TestCase
 import pytest
 from autograder.models import Course, Assignment, Professor, Student
-from autograder.tests.factory import student_factory
+from autograder.tests.factory import course_factory, student_factory, professor_factory
 
 
 @pytest.mark.django_db(transaction=True)
 def test_get_students_of_professor():
-    professor = Professor.objects.create(
-        name="Professor Doe",
-        email="test@test.com",
-    )
+    professor = professor_factory()
 
     # Create a student
     student = student_factory()
 
     # Create a course
-    course = Course.objects.create(
-        course_id="COMP 2402",
-        name="Abstract Data Types and Algorithms",
-        description="Introduction to the design and implementation of abstract data types and to complexity analysis of data structures. Topics include: stacks, queues, lists, trees and graphs. Special attention is given to abstraction, interface specification and hierarchical design using an object-oriented programming language.",
-        section="B",
+    course = course_factory(
         professor=professor,
     )
 

@@ -1,14 +1,15 @@
 from django.test import TestCase
 import pytest
 from autograder.models import Course, Assignment, Professor, Student
+from autograder.tests.factory import (
+    professor_factory,
+    student_factory,
+)
 
 
 @pytest.mark.django_db(transaction=True)
 def test_create_course():
-    professor = Professor.objects.create(
-        name="Professor Doe",
-        email="test@test.com",
-    )
+    professor = professor_factory()
 
     course = Course.objects.create(
         course_id="COMP 2402",
@@ -37,26 +38,12 @@ def test_create_course():
 def test_get_students_of_course():
 
     # Creating a professor
-    example_professor = Professor.objects.create(
-        name="Professor Doe",
-        email="test@test.com",
-    )
+    professor = professor_factory()
 
     # Creating three students
-    student_one = Student.objects.create(
-        name="Student One",
-        email="studentone@test.com",
-    )
-
-    student_two = Student.objects.create(
-        name="Student Two",
-        email="studenttwo@test.com",
-    )
-
-    student_three = Student.objects.create(
-        name="Student Three",
-        email="studentthree@test.com",
-    )
+    student_one = student_factory()
+    student_two = student_factory()
+    student_three = student_factory()
 
     # Create a course
     example_course = Course.objects.create(
@@ -64,7 +51,7 @@ def test_get_students_of_course():
         name="Fundamentals of Web Applications",
         description="Introduction to Internet application development; emphasis on computer science fundamentals of technologies underlying web applications. Topics include: scripting and functional languages, language-based virtual machines, database query languages, remote procedure calls over the Internet, and performance and security concerns in modern distributed applications.",
         section="A",
-        professor=example_professor,
+        professor=professor,
     )
 
     student_one.courses.add(example_course)
