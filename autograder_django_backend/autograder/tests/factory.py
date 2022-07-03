@@ -1,5 +1,5 @@
 from faker import Faker
-from autograder.models import Student
+from autograder.models import Student, Course, Professor
 
 
 fake = Faker()
@@ -18,7 +18,8 @@ def student_factory(**kwargs):
 
     return student
 
-#Create a professor
+
+# Create a professor
 def professor_factory(**kwargs):
     if "name" not in kwargs:
         kwargs["name"] = fake.name()
@@ -32,18 +33,19 @@ def professor_factory(**kwargs):
 
     return professor
 
-#Create a course
+
+# Create a course
 def course_factory(**kwargs):
     if "course_id" not in kwargs:
-        kwargs["course_id"] = fake.course_id()
+        kwargs["course_id"] = fake.pystr()
     if "name" not in kwargs:
         kwargs["name"] = fake.name()
     if "description" not in kwargs:
-        kwargs["description"] = fake.description()
+        kwargs["description"] = fake.text()
     if "section" not in kwargs:
-        kwargs["section"] = fake.section()
-    if "professor" not in kwargs: 
-        kwargs["professor"] = professor_factory();
+        kwargs["section"] = fake.random_letter()
+    if "professor" not in kwargs:
+        kwargs["professor"] = professor_factory()
 
     # Check that there are only 5 arguments in kwargs
     assert len(kwargs) == 5
