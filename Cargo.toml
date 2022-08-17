@@ -1,7 +1,10 @@
 [workspace]
 resolver = "2"
 members = [
-    "autograder_rust_runner",
-    "autograder_rust_scheduler",
-    "autograder_rust_schema",
+    "runner",
+    "backend",
+    "entity",
+    "migration",
+    "schema",
+    "entity",
 ]
