@@ -12,15 +12,6 @@ services:
         # Use the VARIANT arg to pick a Debian OS version: buster, bullseye
         # Use bullseye when on local on arm64/Apple Silicon.
         VARIANT:  bullseye
-    env_file:
-        # Ensure that the variables in .env match the same variables in devcontainer.json
-        - .env
-    # Security Opt and cap_add for C++ based debuggers to work.
-    # See `runArgs`: https://github.com/Microsoft/vscode-docs/blob/main/docs/remote/devcontainerjson-reference.md
-    # security_opt:
-    #   - seccomp:unconfined
-    # cap_add:
-    #   - SYS_PTRACE
 
     volumes:
       - ..:/workspace:cached

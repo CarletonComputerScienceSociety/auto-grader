@@ -1,7 +1,7 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
-// https://github.com/microsoft/vscode-dev-containers/tree/v0.245.0/containers/rust-postgres
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.245.0/containers/typescript-node
 {
-	"name": "Rust and PostgreSQL",
+	"name": "Node.js & TypeScript",
 	"dockerComposeFile": "docker-compose.yml",
 	"service": "app",
 	"workspaceFolder": "/workspace",
@@ -10,18 +10,9 @@
 	"customizations": {
 		// Configure properties specific to VS Code.
 		"vscode": {
-			// Set *default* container specific settings.json values on container create.
-			"settings": { 
-				"lldb.executable": "/usr/bin/lldb",
-				// VS Code don't watch files under ./target
-				"files.watcherExclude": {
-					"**/target/**": true
-				},
-				"rust-analyzer.checkOnSave.command": "clippy"
-			},
-			
 			// Add the IDs of extensions you want installed when the container is created.
 			"extensions": [
+				"dbaeumer.vscode-eslint",
 				"vadimcn.vscode-lldb",
 				"mutantdino.resourcemonitor",
 				"rust-lang.rust-analyzer",
@@ -30,20 +21,22 @@
 				"GitHub.copilot",
 				"RobbOwen.synthwave-vscode",
 				"mtxr.sqltools",
-				"mtxr.sqltools-driver-pg"
+				"mtxr.sqltools-driver-pg",
+				"svelte.svelte-vscode"
 			]
 		}
 	},
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	// "forwardPorts": [5432],
+	// "forwardPorts": [],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "rustc --version",
+	// "postCreateCommand": "yarn install",
 
 	// Comment out to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
-	"remoteUser": "vscode",
+	"remoteUser": "node",
 	"features": {
-		"fish": "latest"
+		"fish": "latest",
+		"rust": "latest"
 	}
 }
