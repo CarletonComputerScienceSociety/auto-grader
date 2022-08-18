@@ -1,3 +1,4 @@
+use actix_cors::Cors;
 use actix_files::Files as Fs;
 use actix_multipart::Multipart;
 use actix_web::{
@@ -6,7 +7,7 @@ use actix_web::{
 
 use entity::job;
 use entity::job::Entity as Job;
-use futures::{TryStreamExt, StreamExt};
+use futures::{StreamExt, TryStreamExt};
 use listenfd::ListenFd;
 use migration::{Migrator, MigratorTrait};
 use sea_orm::DatabaseConnection;
@@ -67,17 +68,31 @@ async fn list(req: HttpRequest, data: web::Data<AppState>) -> Result<HttpRespons
 //     Ok(HttpResponse::Ok().content_type("text/html").body(body))
 // }
 
-#[post("/")]
-async fn create(mut payload: Multipart) -> Result<HttpResponse, Error> {
-    // iterate over multipart stream
+#[post("/upload")]
+async fn create(data: web::Data<AppState>, mut payload: Multipart) -> Result<HttpResponse, Error> {
+    let conn = &data.conn;
+    
+    let mut file_data: Vec<_> = Vec::new();
+
+    // Iterate over multipart stream
     while let Some(item) = payload.next().await {
         let mut field = item?;
 
         // Field in turn is stream of *Bytes* object
         while let Some(chunk) = field.next().await {
-            println!("-- CHUNK: \n{:?}", std::str::from_utf8(&chunk?));
+            let chunk = chunk?;
+            file_data.extend_from_slice(&chunk);
         }
     }
+
+    // Add this new job to the database
+    let new_job = job::ActiveModel {
+        file: Set(Some(file_data)),
+        ..Default::default()
+    };
+
+    // Save the job to the database
+    new_job.insert(conn).await.unwrap();
 
     Ok(HttpResponse::Ok().into())
 }
@@ -147,16 +162,6 @@ async fn main() -> std::io::Result<()> {
     // -> create post table if not exists
     let conn = sea_orm::Database::connect(&db_url).await.unwrap();
 
-    let jobs = (0..100)
-        .into_iter()
-        .map(|_| job::ActiveModel {
-            code: Set("Test".to_owned()),
-            ..Default::default()
-        })
-        .collect::<Vec<_>>();
-
-    let res = job::Entity::insert_many(jobs).exec(&conn).await;
-
     Migrator::up(&conn, None).await.unwrap();
 
     let state = AppState { conn };
@@ -167,7 +172,8 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .service(Fs::new("/static", "./static"))
             .app_data(web::Data::new(state.clone()))
-            .wrap(middleware::Logger::default()) // enable logger
+            .wrap(middleware::Logger::default())
+            .wrap(Cors::permissive())
             .default_service(web::route().to(not_found))
             .configure(init)
     });
@@ -186,7 +192,7 @@ async fn main() -> std::io::Result<()> {
 pub fn init(cfg: &mut web::ServiceConfig) {
     cfg.service(list);
     // cfg.service(new);
-    // cfg.service(create);
+    cfg.service(create);
     // cfg.service(edit);
     // cfg.service(update);
     // cfg.service(delete);

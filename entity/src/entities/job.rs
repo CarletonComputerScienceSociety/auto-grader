@@ -10,7 +10,7 @@ pub struct Model {
     pub id: i32,
     pub started: Option<DateTime>,
     pub completed: Option<DateTime>,
-    pub code: String,
+    pub file: Option<Vec<u8>>,
     pub result: Option<String>,
 }
 

@@ -20,7 +20,7 @@ impl MigrationTrait for Migration {
                     )
                     .col(ColumnDef::new(Job::Started).date_time())
                     .col(ColumnDef::new(Job::Completed).date_time())
-                    .col(ColumnDef::new(Job::Code).string().not_null())
+                    .col(ColumnDef::new(Job::File).binary())
                     .col(ColumnDef::new(Job::Result).string())
                     .to_owned(),
             )
@@ -42,5 +42,5 @@ enum Job {
     Started,
     Completed,
     Result,
-    Code,
+    File,
 }

@@ -22,7 +22,8 @@
 				"RobbOwen.synthwave-vscode",
 				"mtxr.sqltools",
 				"mtxr.sqltools-driver-pg",
-				"svelte.svelte-vscode"
+				"svelte.svelte-vscode",
+				"eamodio.gitlens"
 			]
 		}
 	},
