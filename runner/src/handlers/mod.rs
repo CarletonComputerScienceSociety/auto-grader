@@ -1,4 +1,4 @@
-use rust_schema::Job;
+use schema::Job;
 
 pub mod java;
 pub mod python;

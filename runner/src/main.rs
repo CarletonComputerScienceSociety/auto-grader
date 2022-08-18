@@ -2,8 +2,8 @@ use std::convert::Infallible;
 
 use bytes::BufMut;
 use futures::TryStreamExt;
-use schema::{Job, Language};
 use handlers::{java::Java, python::Python, Handler};
+use schema::{Job, Language};
 use uuid::Uuid;
 use warp::{
     http::StatusCode,

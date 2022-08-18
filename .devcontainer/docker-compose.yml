@@ -1,17 +1,26 @@
 version: '3.8'
 
+volumes:
+  postgres-data:
+
 services:
   app:
     build:
-      context: ..
-      dockerfile: .devcontainer/Dockerfile
+      context: .
+      dockerfile: Dockerfile
       args:
-        # Update 'VARIANT' to pick a version of Python: 3, 3.10, 3.9, 3.8, 3.7, 3.6
-        # Append -bullseye or -buster to pin to an OS version.
-        # Use -bullseye variants on local arm64/Apple Silicon.
-        VARIANT: 3.10-bullseye
-        # Optional Node.js version to install
-        NODE_VERSION: "16"
+        # Use the VARIANT arg to pick a Debian OS version: buster, bullseye
+        # Use bullseye when on local on arm64/Apple Silicon.
+        VARIANT:  bullseye
+    env_file:
+        # Ensure that the variables in .env match the same variables in devcontainer.json
+        - .env
+    # Security Opt and cap_add for C++ based debuggers to work.
+    # See `runArgs`: https://github.com/Microsoft/vscode-docs/blob/main/docs/remote/devcontainerjson-reference.md
+    # security_opt:
+    #   - seccomp:unconfined
+    # cap_add:
+    #   - SYS_PTRACE
 
     volumes:
       - ..:/workspace:cached
@@ -21,27 +30,21 @@ services:
 
     # Runs app on the same network as the database container, allows "forwardPorts" in devcontainer.json function.
     network_mode: service:db
+
     # Uncomment the next line to use a non-root user for all processes.
     # user: vscode
 
-    # Use "forwardPorts" in **devcontainer.json** to forward an app port locally.
+    # Use "forwardPorts" in **devcontainer.json** to forward an app port locally. 
     # (Adding the "ports" property to this file will not forward from a Codespace.)
 
   db:
-    image: postgres:latest
+    image: postgres:14.1
     restart: unless-stopped
     volumes:
       - postgres-data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_DB: postgres
-      POSTGRES_PASSWORD: postgres
+    env_file:
+        # Ensure that the variables in .env match the same variables in devcontainer.json
+        - .env
+
     # Add "forwardPorts": ["5432"] to **devcontainer.json** to forward PostgreSQL locally.
     # (Adding the "ports" property to this file will not forward from a Codespace.)
-    
-  redis:
-    image: redis:latest
-    restart: unless-stopped
-
-volumes:
-  postgres-data: null
