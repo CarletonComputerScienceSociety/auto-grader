@@ -1,10 +1,12 @@
 use actix_files::Files as Fs;
+use actix_multipart::Multipart;
 use actix_web::{
     error, get, middleware, post, web, App, Error, HttpRequest, HttpResponse, HttpServer, Result,
 };
 
 use entity::job;
 use entity::job::Entity as Job;
+use futures::{TryStreamExt, StreamExt};
 use listenfd::ListenFd;
 use migration::{Migrator, MigratorTrait};
 use sea_orm::DatabaseConnection;
@@ -66,26 +68,18 @@ async fn list(req: HttpRequest, data: web::Data<AppState>) -> Result<HttpRespons
 // }
 
 #[post("/")]
-async fn create(
-    data: web::Data<AppState>,
-    post_form: web::Form<post::Model>,
-) -> Result<HttpResponse, Error> {
-    let conn = &data.conn;
+async fn create(mut payload: Multipart) -> Result<HttpResponse, Error> {
+    // iterate over multipart stream
+    while let Some(item) = payload.next().await {
+        let mut field = item?;
 
-    let form = post_form.into_inner();
-
-    post::ActiveModel {
-        title: Set(form.title.to_owned()),
-        text: Set(form.text.to_owned()),
-        ..Default::default()
+        // Field in turn is stream of *Bytes* object
+        while let Some(chunk) = field.next().await {
+            println!("-- CHUNK: \n{:?}", std::str::from_utf8(&chunk?));
+        }
     }
-    .save(conn)
-    .await
-    .expect("could not insert post");
 
-    Ok(HttpResponse::Found()
-        .append_header(("location", "/"))
-        .finish())
+    Ok(HttpResponse::Ok().into())
 }
 
 // #[get("/{id}")]
