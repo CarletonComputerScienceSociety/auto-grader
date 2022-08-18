@@ -1,3 +1,15 @@
 {
-  "python.formatting.provider": "black"
+  "python.formatting.provider": "black",
+  "sqltools.connections": [
+    {
+      "previewLimit": 50,
+      "server": "db",
+      "port": 5432,
+      "askForPassword": true,
+      "driver": "PostgreSQL",
+      "name": "DB",
+      "database": "postgres",
+      "username": "postgres"
+    }
+  ]
 }
