@@ -5,54 +5,71 @@ use std::{
 };
 
 use bytes::BufMut;
+use entity::job::Model as JobModel;
 use futures::TryStreamExt;
 use nomad_client::apis::{configuration::Configuration, nodes_api::get_nodes};
 use reqwest::StatusCode;
-use schema::{Job, Language};
 use uuid::Uuid;
-use warp::{
-    http::Response,
-    multipart::{FormData, Part},
-    Filter, Rejection, Reply,
-};
 
 pub struct JobPool {
-    runners: Mutex<Option<VecDeque<Job>>>,
-    cvar: Condvar,
+    cvar: (Condvar, Mutex<Option<VecDeque<JobModel>>>),
 }
 
 impl JobPool {
     pub fn new() -> Self {
         JobPool {
-            runners: Mutex::new(Some(VecDeque::new())),
-            cvar: Condvar::new(),
+            cvar: (Condvar::new(), Mutex::new(Some(VecDeque::new()))),
         }
     }
 
-    pub fn add_job(&self, job: Job) {
-        let mut runners = self.runners.lock().unwrap();
-        if let Some(queue) = runners.as_mut() {
-            queue.push_back(job);
-            self.cvar.notify_one();
-        }
+    pub fn add_job(&self, job: JobModel) {
+        let (cvar, mutex) = &self.cvar;
+
+        let mut guard = mutex.lock().unwrap();
+
+        guard.as_mut().unwrap().push_back(job);
+        cvar.notify_one();
     }
 
-    pub fn get_job(&self) -> Option<Job> {
-        let mut runners = self.runners.lock().unwrap();
+    pub fn get_job(&self) -> JobModel {
+        let (cvar, mutex) = &self.cvar;
 
-        loop {
-            match runners.as_mut()?.pop_front() {
-                Some(job) => return Some(job),
-                None => {
-                    runners = self.cvar.wait(runners).unwrap();
-                }
-            }
-        }
+        let mut guard = mutex.lock().unwrap();
+
+        // Wait until the mutex is storing a true value, meaning that we have
+        // work to do. This wait is always fine, since the producer will only
+        // notify one at a time.
+        guard = cvar.wait(guard).unwrap();
+
+        // Get the job from the mutex
+        let job = guard.as_mut().unwrap().pop_front().unwrap();
+
+        job
     }
 }
 
 impl Default for JobPool {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_job_pool() {
+        let pool = JobPool::new();
+        let job = JobModel {
+            id: 1,
+            started: None,
+            completed: None,
+            file: None,
+            result: None,
+        };
+        pool.add_job(job);
+        let job = pool.get_job();
+        assert_eq!(job.id, 1);
     }
 }

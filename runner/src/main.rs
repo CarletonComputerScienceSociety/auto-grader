@@ -26,7 +26,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     loop {
         // Get a job from the scheduler
         let res = client
-            .get(&format!("http://{}:4000/register", scheduler_hostname))
+            .get(&format!("http://{}:3001/register", scheduler_hostname))
             .send()
             .await;
 
@@ -39,6 +39,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     Ok(job) => job,
                     Err(e) => {
                         println!("{}", e);
+                        std::thread::sleep(std::time::Duration::from_secs(1));
                         continue;
                     }
                 };
@@ -58,7 +59,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Language::Python => Python::handle(job),
     };
 
-    println!("{}", output);
+    println!("Result: {}", output);
 
     Ok(())
 }

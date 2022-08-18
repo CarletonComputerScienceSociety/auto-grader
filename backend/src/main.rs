@@ -8,18 +8,26 @@ use actix_web::{
 use entity::job;
 use entity::job::Entity as Job;
 use futures::{StreamExt, TryStreamExt};
+use job_pool::JobPool;
 use listenfd::ListenFd;
 use migration::{Migrator, MigratorTrait};
 use sea_orm::DatabaseConnection;
 use sea_orm::{entity::*, query::*};
 use serde::{Deserialize, Serialize};
 use std::env;
+use std::sync::Mutex;
 
 const DEFAULT_POSTS_PER_PAGE: usize = 5;
+
+mod job_pool;
 
 #[derive(Debug, Clone)]
 struct AppState {
     conn: DatabaseConnection,
+}
+
+struct JobPoolState {
+    pool: JobPool,
 }
 
 #[derive(Debug, Deserialize)]
@@ -69,9 +77,13 @@ async fn list(req: HttpRequest, data: web::Data<AppState>) -> Result<HttpRespons
 // }
 
 #[post("/upload")]
-async fn create(data: web::Data<AppState>, mut payload: Multipart) -> Result<HttpResponse, Error> {
+async fn create(
+    data: web::Data<AppState>,
+    pool: web::Data<JobPoolState>,
+    mut payload: Multipart,
+) -> Result<HttpResponse, Error> {
     let conn = &data.conn;
-    
+
     let mut file_data: Vec<_> = Vec::new();
 
     // Iterate over multipart stream
@@ -92,9 +104,27 @@ async fn create(data: web::Data<AppState>, mut payload: Multipart) -> Result<Htt
     };
 
     // Save the job to the database
-    new_job.insert(conn).await.unwrap();
+    let new_job = new_job.insert(conn).await.unwrap();
 
+    // Add the job to the job pool
+    pool.pool.add_job(new_job);
+
+    // Return the id of the job to the client
     Ok(HttpResponse::Ok().into())
+}
+
+#[get("/register")]
+async fn register(
+    data: web::Data<AppState>,
+    pool: web::Data<JobPoolState>,
+) -> Result<HttpResponse, Error> {
+    // Long poll until there is a job available
+    let job = pool.pool.get_job();
+
+    // Return the job to the client
+    Ok(HttpResponse::Ok()
+        .content_type("text/json")
+        .body(serde_json::to_string(&job)?))
 }
 
 // #[get("/{id}")]
@@ -166,12 +196,17 @@ async fn main() -> std::io::Result<()> {
 
     let state = AppState { conn };
 
+    let pool_state = web::Data::new(JobPoolState {
+        pool: JobPool::new(),
+    });
+
     // create server and try to serve over socket if possible
     let mut listenfd = ListenFd::from_env();
     let mut server = HttpServer::new(move || {
         App::new()
             .service(Fs::new("/static", "./static"))
             .app_data(web::Data::new(state.clone()))
+            .app_data(pool_state.clone())
             .wrap(middleware::Logger::default())
             .wrap(Cors::permissive())
             .default_service(web::route().to(not_found))
