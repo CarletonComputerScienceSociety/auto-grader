@@ -18,7 +18,10 @@ impl MigrationTrait for Migration {
                             .auto_increment()
                             .primary_key(),
                     )
+                    .col(ColumnDef::new(Job::Started).date_time())
+                    .col(ColumnDef::new(Job::Completed).date_time())
                     .col(ColumnDef::new(Job::Code).string().not_null())
+                    .col(ColumnDef::new(Job::Result).string())
                     .to_owned(),
             )
             .await
@@ -36,5 +39,8 @@ impl MigrationTrait for Migration {
 enum Job {
     Table,
     Id,
+    Started,
+    Completed,
+    Result,
     Code,
 }

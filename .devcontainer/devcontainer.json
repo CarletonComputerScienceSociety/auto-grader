@@ -28,7 +28,9 @@
 				"tamasfe.even-better-toml",
 				"serayuzgur.crates",
 				"GitHub.copilot",
-				"RobbOwen.synthwave-vscode"
+				"RobbOwen.synthwave-vscode",
+				"mtxr.sqltools",
+				"mtxr.sqltools-driver-pg"
 			]
 		}
 	},
@@ -45,4 +47,3 @@
 		"fish": "latest"
 	}
 }
-ld
