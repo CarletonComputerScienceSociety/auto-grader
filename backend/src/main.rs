@@ -2,12 +2,12 @@ use actix_cors::Cors;
 use actix_files::Files as Fs;
 use actix_multipart::Multipart;
 use actix_web::{
-    error, get, middleware, post, web, App, Error, HttpRequest, HttpResponse, HttpServer, Result,
+    get, middleware, post, web, App, Error, HttpRequest, HttpResponse, HttpServer, Result,
 };
 
 use entity::job;
 use entity::job::Entity as Job;
-use futures::{StreamExt, TryStreamExt};
+use futures::StreamExt;
 use job_pool::JobPool;
 use listenfd::ListenFd;
 use migration::{Migrator, MigratorTrait};
@@ -15,7 +15,6 @@ use sea_orm::DatabaseConnection;
 use sea_orm::{entity::*, query::*};
 use serde::{Deserialize, Serialize};
 use std::env;
-use std::sync::Mutex;
 
 const DEFAULT_POSTS_PER_PAGE: usize = 5;
 
@@ -54,7 +53,7 @@ async fn list(req: HttpRequest, data: web::Data<AppState>) -> Result<HttpRespons
     let paginator = Job::find()
         .order_by_asc(job::Column::Id)
         .paginate(conn, posts_per_page);
-    let num_pages = paginator.num_pages().await.ok().unwrap();
+    let _num_pages = paginator.num_pages().await.ok().unwrap();
 
     let jobs = paginator
         .fetch_page(page - 1)
@@ -119,7 +118,14 @@ async fn register(
     pool: web::Data<JobPoolState>,
 ) -> Result<HttpResponse, Error> {
     // Long poll until there is a job available
-    let job = pool.pool.get_job();
+    // let job = pool.pool.get_job();
+
+    // Get an unfinished job from the db
+    let job = Job::find()
+        .filter(job::Column::Started.is_null())
+        .one(&data.conn)
+        .await
+        .unwrap();
 
     // Return the job to the client
     Ok(HttpResponse::Ok()
@@ -170,7 +176,10 @@ async fn register(
 //         .finish())
 // }
 
-async fn not_found(data: web::Data<AppState>, request: HttpRequest) -> Result<HttpResponse, Error> {
+async fn not_found(
+    _data: web::Data<AppState>,
+    _request: HttpRequest,
+) -> Result<HttpResponse, Error> {
     Ok(HttpResponse::NotFound()
         .content_type("text/html")
         .body("Not Found"))
@@ -226,9 +235,6 @@ async fn main() -> std::io::Result<()> {
 
 pub fn init(cfg: &mut web::ServiceConfig) {
     cfg.service(list);
-    // cfg.service(new);
     cfg.service(create);
-    // cfg.service(edit);
-    // cfg.service(update);
-    // cfg.service(delete);
+    cfg.service(register);
 }

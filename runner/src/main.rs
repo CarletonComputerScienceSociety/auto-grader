@@ -1,9 +1,10 @@
 use std::convert::Infallible;
 
 use bytes::BufMut;
+use entity::job;w
+use entity::job::Entity as Job;
 use futures::TryStreamExt;
 use handlers::{java::Java, python::Python, Handler};
-use schema::{Job, Language};
 use uuid::Uuid;
 use warp::{
     http::StatusCode,
@@ -33,6 +34,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         // Make sure the request was successful
         match res {
             Ok(response) => {
+                // dbg!(&response);
                 job = match serde_json::from_str::<Job>(
                     response.text().await.unwrap_or("".to_string()).as_str(),
                 ) {
@@ -52,6 +54,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
     }
+
+    // Print the file size
+    println!("{}", job.file.unwrap().len());
 
     // Run the job
     let output = match job.file_type {

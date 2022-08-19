@@ -1,15 +1,9 @@
 use std::{
     collections::VecDeque,
-    convert::Infallible,
-    sync::{Arc, Condvar, Mutex},
+    sync::{Condvar, Mutex},
 };
 
-use bytes::BufMut;
 use entity::job::Model as JobModel;
-use futures::TryStreamExt;
-use nomad_client::apis::{configuration::Configuration, nodes_api::get_nodes};
-use reqwest::StatusCode;
-use uuid::Uuid;
 
 pub struct JobPool {
     cvar: (Condvar, Mutex<Option<VecDeque<JobModel>>>),

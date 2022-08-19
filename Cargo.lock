@@ -2131,9 +2131,9 @@ name = "runner"
 version = "0.1.0"
 dependencies = [
  "bytes",
+ "entity",
  "futures",
  "reqwest",
- "schema",
  "serde",
  "serde_json",
  "tokio",
