@@ -1,4 +1,4 @@
-use schema::Job;
+use entity::job::Model as Job;
 
 pub mod java;
 pub mod python;

@@ -213,7 +213,6 @@ async fn main() -> std::io::Result<()> {
     let mut listenfd = ListenFd::from_env();
     let mut server = HttpServer::new(move || {
         App::new()
-            .service(Fs::new("/static", "./static"))
             .app_data(web::Data::new(state.clone()))
             .app_data(pool_state.clone())
             .wrap(middleware::Logger::default())

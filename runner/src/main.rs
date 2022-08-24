@@ -1,8 +1,8 @@
 use std::convert::Infallible;
 
 use bytes::BufMut;
-use entity::job;w
-use entity::job::Entity as Job;
+use entity::job;
+use entity::job::Model as Job;
 use futures::TryStreamExt;
 use handlers::{java::Java, python::Python, Handler};
 use uuid::Uuid;
@@ -22,7 +22,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Get the env var of the hostname
     let scheduler_hostname = std::env::var("SCHEDULER_HOSTNAME").unwrap_or("localhost".to_string());
 
-    let job;
+    let job: Job;
 
     loop {
         // Get a job from the scheduler
@@ -35,7 +35,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         match res {
             Ok(response) => {
                 // dbg!(&response);
-                job = match serde_json::from_str::<Job>(
+                job = match serde_json::from_str(
                     response.text().await.unwrap_or("".to_string()).as_str(),
                 ) {
                     Ok(job) => job,
@@ -56,13 +56,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     // Print the file size
-    println!("{}", job.file.unwrap().len());
+    println!("{}", job.file.as_ref().unwrap().len());
 
     // Run the job
-    let output = match job.file_type {
-        Language::Java => Java::handle(job),
-        Language::Python => Python::handle(job),
-    };
+    // let output = match job.file_type {
+    //     Language::Java => Java::handle(job),
+    //     Language::Python => Python::handle(job),
+    // };
+    let output = Python::handle(job);
 
     println!("Result: {}", output);
 

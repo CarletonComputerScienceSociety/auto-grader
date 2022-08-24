@@ -1,6 +1,6 @@
 use std::{io::Write, process::Command};
 
-use schema::Job;
+use entity::job::Model as Job;
 
 use super::Handler;
 
@@ -9,12 +9,12 @@ pub struct Python();
 impl Handler for Python {
     fn handle(request: Job) -> String {
         // Write the input to a file
-        let mut file = std::fs::File::create(request.file_name.clone()).unwrap();
-        file.write_all(&request.file_data).unwrap();
+        let mut file = std::fs::File::create("main.py").unwrap();
+        file.write_all(&request.file.unwrap()).unwrap();
 
         // Run a Python script
         let output = Command::new("python")
-            .arg(request.file_name)
+            .arg("main.py")
             .output()
             .expect("failed to execute process");
 

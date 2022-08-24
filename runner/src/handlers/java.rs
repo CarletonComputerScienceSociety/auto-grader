@@ -1,8 +1,8 @@
-use std::{process::Command, io::Write};
+use std::{io::Write, process::Command};
 
-use schema::Job;
+use entity::job::Model as Job;
 
-use super::{Handler};
+use super::Handler;
 
 pub struct Java();
 
@@ -12,7 +12,7 @@ impl Handler for Java {
         let input_file_name = format!("HelloWorld.java");
 
         let mut file = std::fs::File::create(input_file_name.clone()).unwrap();
-        file.write_all(&request.file_data).unwrap();
+        file.write_all(&request.file.unwrap()).unwrap();
 
         // Compile Java code
         let _output = Command::new("javac")
